@@ -1,26 +1,25 @@
 # -*- coding: utf-8 -*-
 
-# using sqlite3 for database, works well with python and am using it for 125
-
 import nltk
-nltk.download('wordnet')
-nltk.download('stopwords')
+#nltk.download('wordnet')
+#nltk.download('stopwords')
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem import WordNetLemmatizer 
 from nltk.corpus import stopwords
 from urllib.parse import urlparse
 from urllib.parse import urljoin
 import json
+import sqlite3
 
-#with open("C:\WEBPAGES_CLEAN\\bookkeeping.json") as f:
-#  data = json.load(f)
+from bs4 import BeautifulSoup
+
+with open("C:\WEBPAGES_CLEAN\\bookkeeping.json") as f:
+  data = json.load(f)
 # Output: {'name': 'Bob', 'languages': ['English', 'Fench']}
 #print(data)
+URL = data.get('0/198')
+print(URL)
 
-# Need to write a loop goes through all the files
-
-# get input.txt
-fileName = "input.txt"
 def tokenize(fileName):
     file_text = open(fileName)
     
@@ -47,18 +46,67 @@ def tokenize(fileName):
             
     return List
 
+def computeWordFrequencies(list):
+    frequency = {}        
+    for token in list:
+        count = frequency.get(token, 0)
+        frequency[token] = count + 1
+    return frequency
+
+#file = "0\\198"
+#fileName = "C:\WEBPAGES_CLEAN\\" + file
+#tokens = tokenize(fileName)
+file = "0\\199"
+fileName = "C:\WEBPAGES_CLEAN\\" + file
 tokens = tokenize(fileName)
 
 stopWords = set(stopwords.words('english')) 
-filteredTokens = [w for w in tokens if not w in stopWords] 
+filteredTokens = [w for w in tokens if len(w) > 1 if not w in stopWords] 
 lemmatizer = WordNetLemmatizer() 
 
+lemmatized = []
+
 for i in filteredTokens:
-    print(lemmatizer.lemmatize(i) )
+    #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
+    lemmatized.append(lemmatizer.lemmatize(i))
+    
+dict = computeWordFrequencies(lemmatized)
+print(dict)
+print(dict.get('software'))
+
+conn = sqlite3.connect('test.db')
+print ("Opened database successfully");
+
+cursor = conn.cursor()     
+
+cursor = conn.execute("DELETE FROM UCIIndex")
+
+for key, i in sorted(dict.items()):
+    #print(key, "\t", file, i, URL)
+    conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
+      VALUES (?, ?, ?, ?)", (key, file, i, URL));
+
+conn.commit()
+
+searchWord = "software"
+        
+
+
+cursor = conn.execute("SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = 'software'")
+for row in cursor:
+   print ("Token = ", row[0])
+   print ("File = ", row[1])
+   print ("Frequency = ", row[2])
+   print ("URL = ", row[3], "\n")
+
+print("bye")
+
+conn.close()
+
+
+    
   
-# lemmatization
-print("rocks :", lemmatizer.lemmatize("stripes")) 
-print("corpora :", lemmatizer.lemmatize("corpora")) 
-  
+#print("rocks :", lemmatizer.lemmatize("stripes")) 
+#print("corpora :", lemmatizer.lemmatize("corpora")) 
 # a denotes adjective in "pos" 
-print("better :", lemmatizer.lemmatize("better", pos ="a")) 
+#print("better :", lemmatizer.lemmatize("better", pos ="a")) 
