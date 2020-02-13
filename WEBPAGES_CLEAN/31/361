@@ -1,4 +1,0 @@
- model{
-	for(i in 1:324){
-		SEARCH[i] ~ dlnorm(mean[i],tau)I(LOWER[i],)
-		mean[i]  

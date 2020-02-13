@@ -1,4 +1,0 @@
- model{
-  for(i in 1:30){
-    Conc[i] ~ dnorm(mu[i], tau)
-    mu[i]  

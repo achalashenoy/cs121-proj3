@@ -1,3 +1,0 @@
- model{
-  for(k in 1:180){
-     logy[k]  

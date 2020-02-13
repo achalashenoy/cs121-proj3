@@ -1,7 +1,0 @@
- rdbgateway<body>
- Module rdbgateway 
-  Classes 
-     ConnectionManager   DatabaseGateway   Variables 
-     connection   defaultDSN    [ hide private ] 
-
-</body> 
