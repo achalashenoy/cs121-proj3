@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-
 """
-
-
-
 """
 # run only one time to download wordnet and stopwords
 import nltk
@@ -30,11 +26,6 @@ with open("C:\WEBPAGES_CLEAN\\bookkeeping.json") as f:
 """ if you want to see the data in bookkeeping.json"""
 #print(data)
 
-file = "0/199"
-URL = data.get(file)
-
-""" if you want to see the URL """
-print(URL)
 
 """ tokenize from project 1 """
 def tokenize(fileName):
@@ -75,33 +66,9 @@ def computeWordFrequencies(list):
 #fileName = "C:\WEBPAGES_CLEAN\\" + file
 #tokens = tokenize(fileName)
 
-""" for one file, need to modify the code to read the files in a loop """
-fileForPath = "0\\199" 
-filePath = "C:\WEBPAGES_CLEAN\\" + fileForPath
-tokens = tokenize(filePath)
-
-""" remove stop words """
-stopWords = set(stopwords.words('english')) 
-filteredTokens = [w for w in tokens if len(w) > 1 if not w in stopWords] 
-lemmatizer = WordNetLemmatizer() 
-
-""" lemmatize the date """
-lemmatized = []
-
-for i in filteredTokens:
-    #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
-    lemmatized.append(lemmatizer.lemmatize(i))
-    
-dict = computeWordFrequencies(lemmatized)
-
-""" If you want to see all the data """
-print(dict)
-
-print(dict.get('mapping'))
-
 """ if the database doesn't exist, it will be created """
 conn = sqlite3.connect('Inverted.db')
-print ("Opened database successfully");
+print ("Opened database successfully")
 
 """ IMPORTANT - execute this code one time to create the table, then comment it out """
 """
@@ -117,11 +84,51 @@ cursor = conn.cursor()
 """ Clear the UCIIndex table that had data from the previous run """
 cursor = conn.execute("DELETE FROM UCIIndex")
 
+#file = "0/199"
+for i in range(198, 201):
+    file = "0/" + str(i)
+    URL = data.get(file)
+
+    
+    
+    """ for one file, need to modify the code to read the files in a loop """
+    #fileForPath = "0\\199" 
+    fileForPath = "0\\" + str(i)
+    #print(fileForPath)
+    filePath = "C:\WEBPAGES_CLEAN\\" + fileForPath
+    #print(filePath)
+    tokens = tokenize(filePath)
+    
+    """ remove stop words """
+    stopWords = set(stopwords.words('english')) 
+    filteredTokens = [w for w in tokens if len(w) > 1 if not w in stopWords]
+    
+    lemmatizer = WordNetLemmatizer() 
+
+    """ lemmatize the date """
+    lemmatized = []
+
+    for k in filteredTokens:
+        #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
+        lemmatized.append(lemmatizer.lemmatize(k))
+    
+    dict = computeWordFrequencies(lemmatized)
+    """ if you want to see the URL """
+    print(file)
+    print(URL)
+    """ If you want to see all the data """
+    print(dict)
+    
+    """ to test """
+    #print(dict.get('mapping'))
+
+
+
 """ populate the inverted index """
 for key, i in sorted(dict.items()):
     #print(key, "\t", file, i, URL)
     conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
-      VALUES (?, ?, ?, ?)", (key, file, i, URL));
+      VALUES (?, ?, ?, ?)", (key, file, i, URL))
 
 """ commit the data """
 conn.commit()
@@ -132,7 +139,7 @@ searchWord = "machine"
 Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
 
 """ Execute the query """
-cursor = conn.execute(Query);
+cursor = conn.execute(Query)
 
 """ Display the URLs that have the search word """
 print("\nBelow are results of the query: ")
