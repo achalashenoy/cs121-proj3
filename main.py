@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-"""
 """
 # run only one time to download wordnet and stopwords
 import nltk
@@ -68,7 +65,7 @@ def computeWordFrequencies(list):
 
 """ if the database doesn't exist, it will be created """
 conn = sqlite3.connect('Inverted.db')
-print ("Opened database successfully")
+print ("Opened database successfully");
 
 """ IMPORTANT - execute this code one time to create the table, then comment it out """
 """
@@ -89,7 +86,6 @@ for i in range(198, 201):
     file = "0/" + str(i)
     URL = data.get(file)
 
-    
     
     """ for one file, need to modify the code to read the files in a loop """
     #fileForPath = "0\\199" 
@@ -124,22 +120,23 @@ for i in range(198, 201):
 
 
 
-""" populate the inverted index """
-for key, i in sorted(dict.items()):
-    #print(key, "\t", file, i, URL)
-    conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
-      VALUES (?, ?, ?, ?)", (key, file, i, URL))
-
-""" commit the data """
-conn.commit()
+    """ populate the inverted index """
+    for key, i in sorted(dict.items()):
+        #print(key, "\t", file, i, URL)
+        conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
+          VALUES (?, ?, ?, ?)", (key, file, i, URL));
+    
+    """ commit the data """
+    conn.commit()
 
 """ The query needs to be inputted by the user from the command line """
 searchWord = "machine"
     
 Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
+#Query = "SELECT Token, File, Frequency, URL from UCIIndex"
 
 """ Execute the query """
-cursor = conn.execute(Query)
+cursor = conn.execute(Query);
 
 """ Display the URLs that have the search word """
 print("\nBelow are results of the query: ")
