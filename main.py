@@ -1,32 +1,48 @@
 # -*- coding: utf-8 -*-
+"""
 
+"""
+
+
+
+"""
+# run only one time to download wordnet and stopwords
 import nltk
-#nltk.download('wordnet')
-#nltk.download('stopwords')
-from nltk.tokenize import sent_tokenize, word_tokenize
+nltk.download('wordnet')
+nltk.download('stopwords')
+"""
 from nltk.stem import WordNetLemmatizer 
 from nltk.corpus import stopwords
-from urllib.parse import urlparse
-from urllib.parse import urljoin
+
+""" to obtain urls from bookkeeping.json"""
 import json
+
+""" sqlite3 """
 import sqlite3
 
-from bs4 import BeautifulSoup
+""" maybe beautiful soup is needed later """
+#from bs4 import BeautifulSoup
 
+""" change the path as needed, to load URLs from bookkeeping.json """
 with open("C:\WEBPAGES_CLEAN\\bookkeeping.json") as f:
   data = json.load(f)
-# Output: {'name': 'Bob', 'languages': ['English', 'Fench']}
+  
+""" if you want to see the data in bookkeeping.json"""
 #print(data)
-URL = data.get('0/198')
+
+file = "0/199"
+URL = data.get(file)
+
+""" if you want to see the URL """
 print(URL)
 
+""" tokenize from project 1 """
 def tokenize(fileName):
     file_text = open(fileName)
     
     List = []
     
     for line in file_text:
-        #text = file_text.read()
         textD = line.encode('ascii', errors='ignore').decode()        
     
         prevChar = ""
@@ -46,6 +62,7 @@ def tokenize(fileName):
             
     return List
 
+""" compute frequencies from project 1 """
 def computeWordFrequencies(list):
     frequency = {}        
     for token in list:
@@ -53,17 +70,22 @@ def computeWordFrequencies(list):
         frequency[token] = count + 1
     return frequency
 
+""" if you want to test for two files """
 #file = "0\\198"
 #fileName = "C:\WEBPAGES_CLEAN\\" + file
 #tokens = tokenize(fileName)
-file = "0\\199"
-fileName = "C:\WEBPAGES_CLEAN\\" + file
-tokens = tokenize(fileName)
 
+""" for one file, need to modify the code to read the files in a loop """
+fileForPath = "0\\199" 
+filePath = "C:\WEBPAGES_CLEAN\\" + fileForPath
+tokens = tokenize(filePath)
+
+""" remove stop words """
 stopWords = set(stopwords.words('english')) 
 filteredTokens = [w for w in tokens if len(w) > 1 if not w in stopWords] 
 lemmatizer = WordNetLemmatizer() 
 
+""" lemmatize the date """
 lemmatized = []
 
 for i in filteredTokens:
@@ -71,41 +93,61 @@ for i in filteredTokens:
     lemmatized.append(lemmatizer.lemmatize(i))
     
 dict = computeWordFrequencies(lemmatized)
-print(dict)
-print(dict.get('software'))
 
-conn = sqlite3.connect('test.db')
+""" If you want to see all the data """
+print(dict)
+
+print(dict.get('mapping'))
+
+""" if the database doesn't exist, it will be created """
+conn = sqlite3.connect('Inverted.db')
 print ("Opened database successfully");
+
+""" IMPORTANT - execute this code one time to create the table, then comment it out """
+"""
+conn.execute('''CREATE TABLE UCIIndex
+         (Token           TEXT    NOT NULL,
+         File            INT     NOT NULL,
+         Frequency       INT     NOT NULL,
+         URL             TEXT);''')
+"""
 
 cursor = conn.cursor()     
 
+""" Clear the UCIIndex table that had data from the previous run """
 cursor = conn.execute("DELETE FROM UCIIndex")
 
+""" populate the inverted index """
 for key, i in sorted(dict.items()):
     #print(key, "\t", file, i, URL)
     conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
       VALUES (?, ?, ?, ?)", (key, file, i, URL));
 
+""" commit the data """
 conn.commit()
 
-searchWord = "software"
-        
+""" The query needs to be inputted by the user from the command line """
+searchWord = "machine"
+    
+Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
 
+""" Execute the query """
+cursor = conn.execute(Query);
 
-cursor = conn.execute("SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = 'software'")
+""" Display the URLs that have the search word """
+print("\nBelow are results of the query: ")
 for row in cursor:
-   print ("Token = ", row[0])
-   print ("File = ", row[1])
-   print ("Frequency = ", row[2])
+   """ print for testing, then comment out """
+   print (row[0], " - ", row[1], "," , row[2])
    print ("URL = ", row[3], "\n")
 
-print("bye")
+""" make sure the program has completed """
+print("URLs have been retrieved from the inverted index.")
 
+""" close the database """
 conn.close()
-
-
     
-  
+""" test cases for lemmatization """  
 #print("rocks :", lemmatizer.lemmatize("stripes")) 
 #print("corpora :", lemmatizer.lemmatize("corpora")) 
 # a denotes adjective in "pos" 
