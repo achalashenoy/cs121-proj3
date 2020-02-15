@@ -1,9 +1,8 @@
-"""
+import os 
 # run only one time to download wordnet and stopwords
 import nltk
-nltk.download('wordnet')
-nltk.download('stopwords')
-"""
+'''nltk.download('wordnet')
+nltk.download('stopwords')'''
 from nltk.stem import WordNetLemmatizer 
 from nltk.corpus import stopwords
 
