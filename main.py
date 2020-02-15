@@ -1,7 +1,7 @@
 import os 
 # run only one time to download wordnet and stopwords
-import nltk
-'''nltk.download('wordnet')
+'''import nltk
+nltk.download('wordnet')
 nltk.download('stopwords')'''
 from nltk.stem import WordNetLemmatizer 
 from nltk.corpus import stopwords
@@ -82,8 +82,8 @@ cursor = conn.execute("DELETE FROM UCIIndex")
 
 #file = "0/199"
 for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
-    for file in files:
-        filePath = os.path.join(subdir, file)
+    for f in files:
+        filePath = os.path.join(subdir, f)
         tokens = tokenize(filePath)
         """ remove stop words """
         stopWords = set(stopwords.words('english')) 
@@ -97,10 +97,10 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         for k in filteredTokens:
         #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
             lemmatized.append(lemmatizer.lemmatize(k))
-    
+        URL = data.get(filePath)
         dict = computeWordFrequencies(lemmatized)
         """ if you want to see the URL """
-        print(file)
+        print(filePath)
         print(URL)
         """ If you want to see all the data """
         print(dict)
@@ -114,7 +114,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     for key, i in sorted(dict.items()):
         #print(key, "\t", file, i, URL)
         conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
-          VALUES (?, ?, ?, ?)", (key, file, i, URL));
+          VALUES (?, ?, ?, ?)", (key, filePath, i, URL));
     
     """ commit the data """
     conn.commit()
