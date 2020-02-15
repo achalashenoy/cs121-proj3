@@ -64,15 +64,14 @@ def computeWordFrequencies(list):
 
 """ if the database doesn't exist, it will be created """
 conn = sqlite3.connect('Inverted.db')
-print ("Opened database successfully");
+print ("Opened database successfully")
 
 """ IMPORTANT - execute this code one time to create the table, then comment it out """
-"""
-conn.execute('''CREATE TABLE UCIIndex
+"""conn.execute('''CREATE TABLE UCIIndex
          (Token           TEXT    NOT NULL,
          File            INT     NOT NULL,
          Frequency       INT     NOT NULL,
-         URL             TEXT);''')
+         URL             TEXT)''');
 """
 
 cursor = conn.cursor()     
