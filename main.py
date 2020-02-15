@@ -84,26 +84,14 @@ cursor = conn.execute("DELETE FROM UCIIndex")
 for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     for file in files:
         filePath = os.path.join(subdir, file)
-        tokens = tokenize(filePath):
-    #file = "0/" + str(i)
-    #URL = data.get(file)
-
-    
-    """ for one file, need to modify the code to read the files in a loop """
-    #fileForPath = "0\\199" 
-    #fileForPath = "0\\" + str(i)
-    #print(fileForPath)
-    #filePath = "C:\WEBPAGES_CLEAN\\" + fileForPath
-    #print(filePath)
-    #tokens = tokenize(filePath)
-    
-    """ remove stop words """
+        tokens = tokenize(filePath)
+        """ remove stop words """
         stopWords = set(stopwords.words('english')) 
         filteredTokens = [w for w in tokens if len(w) > 1 if not w in stopWords]
     
         lemmatizer = WordNetLemmatizer() 
 
-    """ lemmatize the date """
+        """ lemmatize the date """
         lemmatized = []
 
         for k in filteredTokens:
@@ -111,13 +99,13 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
             lemmatized.append(lemmatizer.lemmatize(k))
     
         dict = computeWordFrequencies(lemmatized)
-    """ if you want to see the URL """
+        """ if you want to see the URL """
         print(file)
         print(URL)
-    """ If you want to see all the data """
+        """ If you want to see all the data """
         print(dict)
     
-    """ to test """
+        """ to test """
     #print(dict.get('mapping'))
 
 
