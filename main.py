@@ -25,7 +25,7 @@ with open("C:\WEBPAGES_CLEAN\\bookkeeping.json") as f:
 
 """ tokenize from project 1 """
 def tokenize(fileName):
-    file_text = open(fileName)
+    file_text = open(fileName, encoding='utf8')
     
     List = []
     
