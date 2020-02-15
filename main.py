@@ -50,9 +50,9 @@ def tokenize(fileName):
     return List
 
 """ compute frequencies from project 1 """
-def computeWordFrequencies(list):
+def computeWordFrequencies(the_list):
     frequency = {}        
-    for token in list:
+    for token in the_list:
         count = frequency.get(token, 0)
         frequency[token] = count + 1
     return frequency
@@ -80,8 +80,11 @@ cursor = conn.cursor()
 cursor = conn.execute("DELETE FROM UCIIndex")
 
 #file = "0/199"
+documents_num = 0
+
 for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     for f in files:
+        documents_num += 1
         filePath = os.path.join(subdir, f)
         tokens = tokenize(filePath)
         """ remove stop words """
@@ -97,12 +100,12 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
             lemmatized.append(lemmatizer.lemmatize(k))
         URL = data.get(filePath)
-        dict = computeWordFrequencies(lemmatized)
+        the_dict = computeWordFrequencies(lemmatized)
         """ if you want to see the URL """
         print(filePath)
         print(URL)
         """ If you want to see all the data """
-        print(dict)
+        print(the_dict)
     
         """ to test """
     #print(dict.get('mapping'))
@@ -110,7 +113,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
 
 
     """ populate the inverted index """
-    for key, i in sorted(dict.items()):
+    for key, i in sorted(the_dict.items()):
         #print(key, "\t", file, i, URL)
         conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
           VALUES (?, ?, ?, ?)", (key, filePath, i, URL));
@@ -139,6 +142,17 @@ print("URLs have been retrieved from the inverted index.")
 
 """ close the database """
 conn.close()
+
+def NumOfUniques(a_dict):
+    uniques = 0
+    for k,v in a_dict.items():
+        if v == 1:
+            uniques += 1
+    return uniques
+
+
+stats = "# of Documents: " + str(documents_num) + "\n" + "# of Unique Words: " + str(NumOfUniques(the_dict)) + "\n"
+print(stats)
     
 """ test cases for lemmatization """  
 #print("rocks :", lemmatizer.lemmatize("stripes")) 
