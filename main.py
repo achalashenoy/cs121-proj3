@@ -132,10 +132,12 @@ cursor = conn.execute(Query);
 
 """ Display the URLs that have the search word """
 print("\nBelow are results of the query: ")
+list_of_URLs = []
 for row in cursor:
    """ print for testing, then comment out """
    print (row[0], " - ", row[1], "," , row[2])
    print ("URL = ", row[3], "\n")
+   list_of_URLs.append(row[3])
 
 """ make sure the program has completed """
 print("URLs have been retrieved from the inverted index.")
@@ -151,7 +153,9 @@ def NumOfUniques(a_dict):
     return uniques
 
 
-stats = "# of Documents: " + str(documents_num) + "\n" + "# of Unique Words: " + str(NumOfUniques(the_dict)) + "\n"
+stats = "# of Documents: " + str(documents_num) + "\n" 
+stats += "# of Unique Words: " + str(NumOfUniques(the_dict)) + "\n"
+stats += "# of URLs for Query: " + str(len(list_of_URLs)) + "\n"
 print(stats)
     
 """ test cases for lemmatization """  
