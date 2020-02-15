@@ -50,9 +50,9 @@ def tokenize(fileName):
     return List
 
 """ compute frequencies from project 1 """
-def computeWordFrequencies(list):
+def computeWordFrequencies(the_list):
     frequency = {}        
-    for token in list:
+    for token in the_list:
         count = frequency.get(token, 0)
         frequency[token] = count + 1
     return frequency
@@ -97,12 +97,12 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
             lemmatized.append(lemmatizer.lemmatize(k))
         URL = data.get(filePath)
-        dict = computeWordFrequencies(lemmatized)
+        the_dict = computeWordFrequencies(lemmatized)
         """ if you want to see the URL """
         print(filePath)
         print(URL)
         """ If you want to see all the data """
-        print(dict)
+        print(the_dict)
     
         """ to test """
     #print(dict.get('mapping'))
@@ -110,7 +110,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
 
 
     """ populate the inverted index """
-    for key, i in sorted(dict.items()):
+    for key, i in sorted(the_dict.items()):
         #print(key, "\t", file, i, URL)
         conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
           VALUES (?, ?, ?, ?)", (key, filePath, i, URL));
