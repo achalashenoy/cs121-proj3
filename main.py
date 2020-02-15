@@ -80,8 +80,11 @@ cursor = conn.cursor()
 cursor = conn.execute("DELETE FROM UCIIndex")
 
 #file = "0/199"
+documents_num = 0
+
 for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     for f in files:
+        documents_num += 1
         filePath = os.path.join(subdir, f)
         tokens = tokenize(filePath)
         """ remove stop words """
@@ -139,6 +142,17 @@ print("URLs have been retrieved from the inverted index.")
 
 """ close the database """
 conn.close()
+
+def NumOfUniques(a_dict):
+    uniques = 0
+    for k,v in a_dict.items():
+        if v == 1:
+            uniques += 1
+    return uniques
+
+
+stats = "# of Documents: " + str(documents_num) + "\n" + "# of Unique Words: " + str(NumOfUniques(the_dict)) + "\n"
+print(stats)
     
 """ test cases for lemmatization """  
 #print("rocks :", lemmatizer.lemmatize("stripes")) 
