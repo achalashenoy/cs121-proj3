@@ -153,7 +153,7 @@ print(len(the_dict))
     conn.commit()'''
 
 """ The query needs to be inputted by the user from the command line """
-searchWord = "informatics"
+searchWord = "mondego"
     
 Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex"
@@ -193,6 +193,7 @@ def NumOfUniques(a_dict):
 stats = "# of Documents: " + str(documents_num) + "\n" 
 stats += "# of Unique Words: " + str(NumOfUniques(doc_dict)) + "\n"
 stats += "# of URLs for Query: " + str(len(list_of_URLs)) + "\n"
+stats += str(list_of_URLs[:24]) + "\n"
 print(stats)
     
 """ test cases for lemmatization """  
