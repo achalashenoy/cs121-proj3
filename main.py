@@ -123,34 +123,34 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         URL = data.get(filePath)
         for l in lemmatized:
             token_doc_url_file_tuple_list.append((l, filePath, documents_num, URL))
-            doc_dict[l].append(documents_num) 
-        #the_dict = computeWordFrequencies(lemmatized)
-        the_dict = newComputeWordFrequencies(the_dict, lemmatized)
-        #doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
+            #doc_dict[l].append(documents_num) 
+        the_dict = computeWordFrequencies(lemmatized)
+        #the_dict = newComputeWordFrequencies(the_dict, lemmatized)
+        doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
         """ if you want to see the URL """
         print(filePath)
         print(URL)
+        """ populate the inverted index """
+
+        for key, i in sorted(the_dict.items()):
+        #print(key, "\t", file, i, URL)
+            conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
+                VALUES (?, ?, ?, ?)", (key, filePath, i, URL))
+    
+        """ commit the data """
+        conn.commit()
+
 """ If you want to see all the data """
 print(the_dict)
 print(len(the_dict))
 
 """ to test """
 #print(dict.get('mapping'))
-""" populate the inverted index """
-'''
-for key, i in sorted(final_dict.items()):
-    #print(key, "\t", file, i, URL)
-    conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
-        VALUES (?, ?, ?, ?)", (key, filePath, i, URL));
-    
-    """ commit the data """
-    conn.commit()
-'''
-for item in sorted(token_doc_url_file_tuple_list):
+'''for item in sorted(token_doc_url_file_tuple_list):
     conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
         VALUES (?, ?, ?, ?)", (item[0], item[1], the_dict[item[0]], item[3])); 
     """ commit the data """
-    conn.commit()
+    conn.commit()'''
 
 """ The query needs to be inputted by the user from the command line """
 searchWord = "informatics"
@@ -159,7 +159,7 @@ Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + sea
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex"
 
 """ Execute the query """
-cursor = conn.execute(Query);
+cursor = conn.execute(Query)
 
 """ Display the URLs that have the search word """
 print("\nBelow are results of the query: ")
