@@ -12,6 +12,9 @@ import json
 """ sqlite3 """
 import sqlite3
 
+'''defaultdict for dictionary of lists containing the docs for each token'''
+from collections import defaultdict
+
 """ maybe beautiful soup is needed later """
 #from bs4 import BeautifulSoup
 
@@ -63,6 +66,11 @@ def newComputeWordFrequencies(a_dict, the_list):
         a_dict[token] = count + 1
     return a_dict
 
+def computeDocsWithWords(a_dict, the_list, docNum):
+    for token in the_list:
+        a_dict[token].append(docNum)
+    return a_dict
+
 """ if you want to test for two files """
 #file = "0\\198"
 #fileName = "C:\WEBPAGES_CLEAN\\" + file
@@ -89,6 +97,7 @@ cursor = conn.execute("DELETE FROM UCIIndex")
 documents_num = 0
 
 the_dict = {}
+doc_dict = defaultdict(list)
 for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     for f in files:
         documents_num += 1
@@ -109,6 +118,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         URL = data.get(filePath)
         #the_dict = computeWordFrequencies(lemmatized)
         the_dict = newComputeWordFrequencies(the_dict, lemmatized)
+        doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
         """ if you want to see the URL """
         print(filePath)
         print(URL)
@@ -149,17 +159,23 @@ print("URLs have been retrieved from the inverted index.")
 
 """ close the database """
 conn.close()
-
+'''
 def NumOfUniques(a_dict):
     uniques = 0
     for k,v in a_dict.items():
         if v == 1:
             uniques += 1
     return uniques
-
+'''
+def NumOfUniques(a_dict):
+    uniques = 0
+    for docs in a_dict.values():
+        if len(docs) == 1:
+            uniques += 1
+    return uniques
 
 stats = "# of Documents: " + str(documents_num) + "\n" 
-stats += "# of Unique Words: " + str(NumOfUniques(the_dict)) + "\n"
+stats += "# of Unique Words: " + str(NumOfUniques(doc_dict)) + "\n"
 stats += "# of URLs for Query: " + str(len(list_of_URLs)) + "\n"
 print(stats)
     
