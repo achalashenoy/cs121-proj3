@@ -82,6 +82,7 @@ cursor = conn.execute("DELETE FROM UCIIndex")
 #file = "0/199"
 documents_num = 0
 
+the_dict = {}
 for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     for f in files:
         documents_num += 1
@@ -100,7 +101,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
             lemmatized.append(lemmatizer.lemmatize(k))
         URL = data.get(filePath)
-        the_dict = computeWordFrequencies(lemmatized)
+        the_dict.update(computeWordFrequencies(lemmatized))
         """ if you want to see the URL """
         print(filePath)
         print(URL)
@@ -108,10 +109,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         print(the_dict)
     
         """ to test """
-    #print(dict.get('mapping'))
-
-
-
+        #print(dict.get('mapping'))
     """ populate the inverted index """
     for key, i in sorted(the_dict.items()):
         #print(key, "\t", file, i, URL)
