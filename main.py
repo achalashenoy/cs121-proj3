@@ -100,6 +100,7 @@ documents_num = 0
 the_dict = {}
 '''the below list is made up of tuples in the form of (token, filePath, documents_num, URL)'''
 token_doc_url_file_tuple_list = []
+doc_dict = defaultdict(list)
 for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     for f in files:
         documents_num += 1
@@ -121,7 +122,8 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
             lemmatized.append(lemmatizer.lemmatize(k))
         URL = data.get(filePath)
         for l in lemmatized:
-            token_doc_url_file_tuple_list.append((l, filePath, documents_num, URL)) 
+            token_doc_url_file_tuple_list.append((l, filePath, documents_num, URL))
+            doc_dict[l].append(documents_num) 
         #the_dict = computeWordFrequencies(lemmatized)
         the_dict = newComputeWordFrequencies(the_dict, lemmatized)
         #doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
