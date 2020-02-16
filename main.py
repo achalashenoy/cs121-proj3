@@ -57,6 +57,12 @@ def computeWordFrequencies(the_list):
         frequency[token] = count + 1
     return frequency
 
+def newComputeWordFrequencies(a_dict, the_list):
+    for token in the_list:
+        count = a_dict.get(token, 0)
+        a_dict[token] = count + 1
+    return a_dict
+
 """ if you want to test for two files """
 #file = "0\\198"
 #fileName = "C:\WEBPAGES_CLEAN\\" + file
@@ -101,7 +107,8 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
             lemmatized.append(lemmatizer.lemmatize(k))
         URL = data.get(filePath)
-        the_dict.update(computeWordFrequencies(lemmatized))
+        #the_dict = computeWordFrequencies(lemmatized)
+        the_dict = newComputeWordFrequencies(the_dict, lemmatized)
         """ if you want to see the URL """
         print(filePath)
         print(URL)
