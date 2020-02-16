@@ -96,13 +96,17 @@ cursor = conn.execute("DELETE FROM UCIIndex")
 #file = "0/199"
 documents_num = 0
 
+'''the_dict is a dictionary where the keys are tokens and the values are frequencies'''
 the_dict = {}
-doc_dict = defaultdict(list)
+'''the below list is made up of tuples in the form of (token, filePath, documents_num, URL)'''
+token_doc_url_file_tuple_list = []
 for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     for f in files:
         documents_num += 1
         filePath = os.path.join(subdir, f)
         tokens = tokenize(filePath)
+        filePath = subdir[18:] + "/" + f
+
         """ remove stop words """
         stopWords = set(stopwords.words('english')) 
         filteredTokens = [w for w in tokens if len(w) > 1 if not w in stopWords]
@@ -116,28 +120,38 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
             lemmatized.append(lemmatizer.lemmatize(k))
         URL = data.get(filePath)
+        for l in lemmatized:
+            token_doc_url_file_tuple_list.append((l, filePath, documents_num, URL)) 
         #the_dict = computeWordFrequencies(lemmatized)
         the_dict = newComputeWordFrequencies(the_dict, lemmatized)
-        doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
+        #doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
         """ if you want to see the URL """
         print(filePath)
         print(URL)
-        """ If you want to see all the data """
-        print(the_dict)
+""" If you want to see all the data """
+print(the_dict)
+print(len(the_dict))
+
+""" to test """
+#print(dict.get('mapping'))
+""" populate the inverted index """
+'''
+for key, i in sorted(final_dict.items()):
+    #print(key, "\t", file, i, URL)
+    conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
+        VALUES (?, ?, ?, ?)", (key, filePath, i, URL));
     
-        """ to test """
-        #print(dict.get('mapping'))
-    """ populate the inverted index """
-    for key, i in sorted(the_dict.items()):
-        #print(key, "\t", file, i, URL)
-        conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
-          VALUES (?, ?, ?, ?)", (key, filePath, i, URL));
-    
+    """ commit the data """
+    conn.commit()
+'''
+for item in sorted(token_doc_url_file_tuple_list):
+    conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
+        VALUES (?, ?, ?, ?)", (item[0], item[1], the_dict[item[0]], item[3])); 
     """ commit the data """
     conn.commit()
 
 """ The query needs to be inputted by the user from the command line """
-searchWord = "machine"
+searchWord = "informatics"
     
 Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex"
