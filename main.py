@@ -88,6 +88,15 @@ print ("Opened database successfully")
          URL             TEXT)''');
 """
 
+"""execute this code one time to create the 2-gram table, then comment it out """
+"""conn.execute('''CREATE TABLE uciNGramIndex
+         (first_half           TEXT    NOT NULL,
+         second_half           TEXT     NOT NULL,
+         URL             TEXT,
+         Document        TEXT  NOT NULL)''')
+"""
+"""
+
 cursor = conn.cursor()     
 
 """ Clear the UCIIndex table that had data from the previous run """
@@ -123,7 +132,20 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         URL = data.get(filePath)
         for l in lemmatized:
             token_doc_url_file_tuple_list.append((l, filePath, documents_num, URL))
-            #doc_dict[l].append(documents_num) 
+            #doc_dict[l].append(documents_num)
+
+        # Below is me finding the 2-grams then adding the 2-grams to the 2-gram table -Jen
+        other_list = the_list
+        n_gram = []
+        for i in (range(len(other_list))):
+            if (len(other_list) <= 1):
+                break
+            n_gram.append(other_list[0])
+            n_gram.append(other_list[1])
+            other_list = other_list[1:]
+            conn.execute("INSERT INTO uciNGramIndex (n_gram[0], n_gram[1], documents_num, URL) \
+                VALUES (?, ?, ?, ?)", (key, filePath, i, URL))
+            n_gram = []
         the_dict = computeWordFrequencies(lemmatized)
         #the_dict = newComputeWordFrequencies(the_dict, lemmatized)
         doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
