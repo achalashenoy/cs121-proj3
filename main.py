@@ -60,11 +60,11 @@ def computeWordFrequencies(the_list):
         frequency[token] = count + 1
     return frequency
 
-def newComputeWordFrequencies(a_dict, the_list):
+'''def newComputeWordFrequencies(a_dict, the_list):
     for token in the_list:
         count = a_dict.get(token, 0)
         a_dict[token] = count + 1
-    return a_dict
+    return a_dict'''
 
 def computeDocsWithWords(a_dict, the_list, docNum):
     for token in the_list:
@@ -97,7 +97,7 @@ cursor = conn.execute("DELETE FROM UCIIndex")
 documents_num = 0
 
 '''the_dict is a dictionary where the keys are tokens and the values are frequencies'''
-the_dict = {}
+#the_dict = {}
 '''the below list is made up of tuples in the form of (token, filePath, documents_num, URL)'''
 token_doc_url_file_tuple_list = []
 doc_dict = defaultdict(list)
