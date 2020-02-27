@@ -88,9 +88,18 @@ print ("Opened database successfully")
          URL             TEXT)''');
 """
 
+"""execute this code one time to create the 2-gram table, then comment it out """
+"""conn.execute('''CREATE TABLE uciNGramIndex
+         (first_half           TEXT    NOT NULL,
+         second_half           TEXT     NOT NULL,
+         URL             TEXT,
+         Document        TEXT  NOT NULL)''')
+"""
+"""
+
 cursor = conn.cursor()     
 
-""" Clear the UCIIndex table that had data from the previous run """
+""" """Clear the UCIIndex table that had data from the previous run""" """
 cursor = conn.execute("DELETE FROM UCIIndex")
 
 #file = "0/199"
@@ -108,13 +117,13 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         tokens = tokenize(filePath)
         filePath = subdir[18:] + "/" + f
 
-        """ remove stop words """
+        """ """remove stop words""" """
         stopWords = set(stopwords.words('english')) 
         filteredTokens = [w for w in tokens if len(w) > 1 if not w in stopWords]
     
         lemmatizer = WordNetLemmatizer() 
 
-        """ lemmatize the date """
+        """ """lemmatize the date""" """
         lemmatized = []
 
         for k in filteredTokens:
@@ -123,57 +132,89 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         URL = data.get(filePath)
         for l in lemmatized:
             token_doc_url_file_tuple_list.append((l, filePath, documents_num, URL))
-            #doc_dict[l].append(documents_num) 
+            #doc_dict[l].append(documents_num)
+
+        # Below is me finding the 2-grams then adding the 2-grams to the 2-gram table -Jen
+        other_list = the_list
+        n_gram = []
+        for i in (range(len(other_list))):
+            if (len(other_list) <= 1):
+                break
+            n_gram.append(other_list[0])
+            n_gram.append(other_list[1])
+            other_list = other_list[1:]
+            conn.execute("INSERT INTO uciNGramIndex (n_gram[0], n_gram[1], documents_num, URL) \
+                VALUES (?, ?, ?, ?)", (key, filePath, i, URL))
+            n_gram = []
         the_dict = computeWordFrequencies(lemmatized)
         #the_dict = newComputeWordFrequencies(the_dict, lemmatized)
         doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
-        """ if you want to see the URL """
+        """ """if you want to see the URL""" """
         print(filePath)
         print(URL)
-        """ populate the inverted index """
+        """ """populate the inverted index""" """
 
         for key, i in sorted(the_dict.items()):
         #print(key, "\t", file, i, URL)
             conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
                 VALUES (?, ?, ?, ?)", (key, filePath, i, URL))
     
-        """ commit the data """
+        """ """commit the data""" """
         conn.commit()
 
-""" If you want to see all the data """
+""" """If you want to see all the data""" """
 print(the_dict)
 print(len(the_dict))
 
-""" to test """
+""" """to test""" """
 #print(dict.get('mapping'))
 '''for item in sorted(token_doc_url_file_tuple_list):
     conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
         VALUES (?, ?, ?, ?)", (item[0], item[1], the_dict[item[0]], item[3])); 
-    """ commit the data """
+    """ """commit the data""" """
     conn.commit()'''
 
-""" The query needs to be inputted by the user from the command line """
-searchWord = "mondego"
-    
-Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
+""" """The query needs to be inputted by the user from the command line""" 
+#searchWord = 'mondego'
+searchWord = input("Enter your search terms: ")
+terms = searchWord.split(" ")
+
+"""
+
+#Will test this when I get home, probably works but there may be a faster way than executing multiple queries
+list_of_URLs = []
+for term in terms:
+    Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + term + "'"
+    """ """Execute the query""" """
+    cursor = conn.execute(Query)
+    """ """Display the URLs that have the search word""" """
+    print("\nBelow are results of the query: ")
+    for row in cursor:
+        """ """print for testing, then comment out""" """
+        if row[3] not in list_of_URLs:
+            print (row[0], " - ", row[1], "," , row[2])
+            print ("URL = ", row[3], "\n")
+            list_of_URLs.append(row[3])
+
+#Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex"
 
-""" Execute the query """
-cursor = conn.execute(Query)
+""" """Execute the query""" """
+#cursor = conn.execute(Query)
 
-""" Display the URLs that have the search word """
-print("\nBelow are results of the query: ")
-list_of_URLs = []
-for row in cursor:
-   """ print for testing, then comment out """
-   print (row[0], " - ", row[1], "," , row[2])
-   print ("URL = ", row[3], "\n")
-   list_of_URLs.append(row[3])
+""" """Display the URLs that have the search word""" """
+#print("\nBelow are results of the query: ")
+#list_of_URLs = []
+#for row in cursor:
+#   """ """print for testing, then comment out""" """
+#   print (row[0], " - ", row[1], "," , row[2])
+#   print ("URL = ", row[3], "\n")
+#   list_of_URLs.append(row[3])
 
-""" make sure the program has completed """
+""" """make sure the program has completed""" """
 print("URLs have been retrieved from the inverted index.")
 
-""" close the database """
+""" """close the database""" """
 conn.close()
 '''
 def NumOfUniques(a_dict):
@@ -194,10 +235,4 @@ stats = "# of Documents: " + str(documents_num) + "\n"
 stats += "# of Unique Words: " + str(NumOfUniques(doc_dict)) + "\n"
 stats += "# of URLs for Query: " + str(len(list_of_URLs)) + "\n"
 stats += str(list_of_URLs[:24]) + "\n"
-print(stats)
-    
-""" test cases for lemmatization """  
-#print("rocks :", lemmatizer.lemmatize("stripes")) 
-#print("corpora :", lemmatizer.lemmatize("corpora")) 
-# a denotes adjective in "pos" 
-#print("better :", lemmatizer.lemmatize("better", pos ="a")) 
+print(stats)"""
