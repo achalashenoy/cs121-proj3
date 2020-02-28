@@ -114,7 +114,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         tokens = tokenize(filePath)
         filePath = subdir[18:] + "/" + f
 
-        """ """remove stop words""" """
+        """ remove stop words """
         stopWords = set(stopwords.words('english')) 
         filteredTokens = [w for w in tokens if len(w) > 1 if not w in stopWords]
     
