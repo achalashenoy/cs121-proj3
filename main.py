@@ -120,7 +120,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     
         lemmatizer = WordNetLemmatizer() 
 
-        """ """lemmatize the date""" """
+        """lemmatize the date """
         lemmatized = []
 
         for k in filteredTokens:
@@ -146,24 +146,24 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         the_dict = computeWordFrequencies(lemmatized)
         #the_dict = newComputeWordFrequencies(the_dict, lemmatized)
         doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
-        """ """if you want to see the URL""" """
+        """if you want to see the URL """
         print(filePath)
         print(URL)
-        """ """populate the inverted index""" """
+        """ populate the inverted index """
 
         for key, i in sorted(the_dict.items()):
         #print(key, "\t", file, i, URL)
             conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
                 VALUES (?, ?, ?, ?)", (key, filePath, i, URL))
     
-        """ """commit the data""" """
+        """ commit the data """
         conn.commit()
 
-""" """If you want to see all the data""" """
+""" If you want to see all the data """
 print(the_dict)
 print(len(the_dict))
 
-""" """to test""" """
+""" to test """
 #print(dict.get('mapping'))
 '''for item in sorted(token_doc_url_file_tuple_list):
     conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
@@ -171,23 +171,22 @@ print(len(the_dict))
     """ """commit the data""" """
     conn.commit()'''
 
-""" """The query needs to be inputted by the user from the command line""" 
+""" The query needs to be inputted by the user from the command line""" 
 #searchWord = 'mondego'
 searchWord = input("Enter your search terms: ")
 terms = searchWord.split(" ")
 
-"""
 
 #Will test this when I get home, probably works but there may be a faster way than executing multiple queries
 list_of_URLs = []
 for term in terms:
     Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + term + "'"
-    """ """Execute the query""" """
+    """ Execute the query """
     cursor = conn.execute(Query)
-    """ """Display the URLs that have the search word""" """
+    """ Display the URLs that have the search word """
     print("\nBelow are results of the query: ")
     for row in cursor:
-        """ """print for testing, then comment out""" """
+        """ print for testing, then comment out """
         if row[3] not in list_of_URLs:
             print (row[0], " - ", row[1], "," , row[2])
             print ("URL = ", row[3], "\n")
@@ -196,10 +195,10 @@ for term in terms:
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex"
 
-""" """Execute the query""" """
+""" Execute the query """
 #cursor = conn.execute(Query)
 
-""" """Display the URLs that have the search word""" """
+""" Display the URLs that have the search word """
 #print("\nBelow are results of the query: ")
 #list_of_URLs = []
 #for row in cursor:
@@ -208,19 +207,12 @@ for term in terms:
 #   print ("URL = ", row[3], "\n")
 #   list_of_URLs.append(row[3])
 
-""" """make sure the program has completed""" """
+""" make sure the program has completed """
 print("URLs have been retrieved from the inverted index.")
 
-""" """close the database""" """
+""" close the database """
 conn.close()
-'''
-def NumOfUniques(a_dict):
-    uniques = 0
-    for k,v in a_dict.items():
-        if v == 1:
-            uniques += 1
-    return uniques
-'''
+
 def NumOfUniques(a_dict):
     uniques = 0
     for docs in a_dict.values():
@@ -232,4 +224,4 @@ stats = "# of Documents: " + str(documents_num) + "\n"
 stats += "# of Unique Words: " + str(NumOfUniques(doc_dict)) + "\n"
 stats += "# of URLs for Query: " + str(len(list_of_URLs)) + "\n"
 stats += str(list_of_URLs[:24]) + "\n"
-print(stats)"""
+print(stats)
