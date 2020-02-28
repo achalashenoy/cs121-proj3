@@ -89,25 +89,22 @@ print ("Opened database successfully")
 """
 
 """execute this code one time to create the 2-gram table, then comment it out """
-"""conn.execute('''CREATE TABLE uciNGramIndex
+conn.execute('''CREATE TABLE uciNGramIndex
          (first_half           TEXT    NOT NULL,
          second_half           TEXT     NOT NULL,
          URL             TEXT,
          Document        TEXT  NOT NULL)''')
-"""
-"""
 
 cursor = conn.cursor()     
 
-""" """Clear the UCIIndex table that had data from the previous run""" """
+"""Clear the UCIIndex table that had data from the previous run""" 
 cursor = conn.execute("DELETE FROM UCIIndex")
 
-#file = "0/199"
+#file = "0/199
 documents_num = 0
 
 '''the_dict is a dictionary where the keys are tokens and the values are frequencies'''
 #the_dict = {}
-'''the below list is made up of tuples in the form of (token, filePath, documents_num, URL)'''
 token_doc_url_file_tuple_list = []
 doc_dict = defaultdict(list)
 for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
