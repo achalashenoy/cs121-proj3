@@ -143,8 +143,8 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
             n_gram.append(other_list[0])
             n_gram.append(other_list[1])
             other_list = other_list[1:]
-            conn.execute("INSERT INTO uciNGramIndex (n_gram[0], n_gram[1], documents_num, URL) \
-                VALUES (?, ?, ?, ?)", (key, filePath, i, URL))
+            conn.execute("INSERT INTO uciNGramIndex (first_half, second_half, URL, Document) \
+                VALUES (?, ?, ?, ?)", (n_gram[0], n_gram[1], URL, documents_num))
             n_gram = []
         the_dict = computeWordFrequencies(lemmatized)
         #the_dict = newComputeWordFrequencies(the_dict, lemmatized)
