@@ -135,7 +135,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
             #doc_dict[l].append(documents_num)
 
         # Below is me finding the 2-grams then adding the 2-grams to the 2-gram table -Jen
-        other_list = the_list
+        other_list = lemmatized
         n_gram = []
         for i in (range(len(other_list))):
             if (len(other_list) <= 1):
