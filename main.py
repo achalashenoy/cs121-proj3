@@ -69,16 +69,38 @@ def NewTokenize(fileName):
         final_list.append(s.lower().strip(punctuation))
     return final_list
 
+'''This will return list of tokens inside HTML tags, in the form of (token, type_of_tag).
+For example, if the text is "<i>apple</i>", the list returned will be [("apple", "i")].''' 
 def returnlistOfAllTaggedTokens(the_string):
     list_of_tokens = []
     soup = BeautifulSoup(the_string, "html.parser")
     italicized = soup.find_all('i')
     bolded = soup.find_all('b')
     underlined = soup.find_all('u')
-    all_together = italicized + bolded + underlined
+    h1 = soup.find_all('h1')
+    h2 = soup.find_all('h2')
+    h3 = soup.find_all('h3')
+    title = soup.find_all('title')
+    all_together = italicized + bolded + underlined + h1 + h2 + h3 + title  
     for i in all_together:
-        content =  re.sub("<.*?>", "", str(i))
-        list_of_tokens.extend(content.split())
+        if i in italicized:
+            content =  re.sub("<.*?>", "", str(i))
+            list_of_tokens.extend([(token, "i") for token in content.split()])
+        if i in bolded:
+            content =  re.sub("<.*?>", "", str(i))
+            list_of_tokens.extend([(token, "b") for token in content.split()])
+        if i in underlined:
+            content =  re.sub("<.*?>", "", str(i))
+            list_of_tokens.extend([(token, "u") for token in content.split()])
+        if i in h1:
+            content =  re.sub("<.*?>", "", str(i))
+            list_of_tokens.extend([(token, "h1") for token in content.split()])
+        if i in h2:
+            content =  re.sub("<.*?>", "", str(i))
+            list_of_tokens.extend([(token, "h2") for token in content.split()])
+        if i in h3:
+            content =  re.sub("<.*?>", "", str(i))
+            list_of_tokens.extend([(token, "h3") for token in content.split()])        
     return list_of_tokens
 
 """ compute frequencies from project 1 """
