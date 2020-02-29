@@ -16,7 +16,9 @@ import sqlite3
 from collections import defaultdict
 
 """ maybe beautiful soup is needed later """
-#from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
+
+from string import punctuation
 
 """ change the path as needed, to load URLs from bookkeeping.json """
 with open("C:\WEBPAGES_CLEAN\\bookkeeping.json") as f:
@@ -33,8 +35,7 @@ def tokenize(fileName):
     List = []
     
     for line in file_text:
-        textD = line.encode('ascii', errors='ignore').decode()        
-    
+        textD = line.encode('ascii', errors='ignore').decode()
         prevChar = ""
         word = ""
         for i in textD:
@@ -51,6 +52,22 @@ def tokenize(fileName):
             List.append(word.lower())
             
     return List
+
+'''Not sure if this will be a better tokenizer. I tested it out and it LOOKS fine, but you will have to test it more.'''
+def NewTokenize(fileName):
+    file_text = open(fileName, encoding='utf8')
+    list_of_tokens = []
+    final_list = []
+    textD = file_text.encode('ascii', errors='ignore').decode()
+    for line in textD:        
+        soup = BeautifulSoup(line, "html.parser")
+        str_in_tags = [s for s in soup.strings]
+        for s in str_in_tags:
+            list_of_tokens.extend(s.split())
+    for s in list_of_tokens:
+        final_list.append(s.lower().strip(punctuation))
+    return final_list
+
 
 """ compute frequencies from project 1 """
 def computeWordFrequencies(the_list):
@@ -111,7 +128,7 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
     for f in files:
         documents_num += 1
         filePath = os.path.join(subdir, f)
-        tokens = tokenize(filePath)
+        tokens = NewTokenize(filePath)
         filePath = subdir[18:] + "/" + f
 
         """ remove stop words """
