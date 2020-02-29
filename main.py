@@ -1,4 +1,5 @@
 import os 
+import re
 # run only one time to download wordnet and stopwords
 '''import nltk
 nltk.download('wordnet')
@@ -68,6 +69,17 @@ def NewTokenize(fileName):
         final_list.append(s.lower().strip(punctuation))
     return final_list
 
+def returnlistOfAllTaggedTokens(the_string):
+    list_of_tokens = []
+    soup = BeautifulSoup(the_string, "html.parser")
+    italicized = soup.find_all('i')
+    bolded = soup.find_all('b')
+    underlined = soup.find_all('u')
+    all_together = italicized + bolded + underlined
+    for i in all_together:
+        content =  re.sub("<.*?>", "", str(i))
+        list_of_tokens.extend(content.split())
+    return list_of_tokens
 
 """ compute frequencies from project 1 """
 def computeWordFrequencies(the_list):
