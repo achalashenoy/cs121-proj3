@@ -143,7 +143,8 @@ conn.execute('pragma synchronous=OFF')
 """
 
 # execute this code one time to create the 2-gram table, then comment it out 
-conn.execute("DROP TABLE uciNGramIndex")
+# uncomment the drop table as needed
+#conn.execute("DROP TABLE uciNGramIndex")
 conn.execute('''CREATE TABLE uciNGramIndex
          (first_half           TEXT    NOT NULL,
          second_half           TEXT     NOT NULL,
