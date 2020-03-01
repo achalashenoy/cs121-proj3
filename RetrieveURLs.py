@@ -6,7 +6,7 @@ from numpy.linalg import norm
 import operator
 
 """ if the database doesn't exist, it will be created """
-conn = sqlite3.connect('Inverted3.db')
+conn = sqlite3.connect('Inverted.db')
 print ("Opened database successfully")
 
 cursor = conn.cursor()     
