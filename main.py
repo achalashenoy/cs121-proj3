@@ -188,14 +188,15 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_RAW"):
         print(filePath)
         weight = 1
         for key, i in sorted(the_dict.items()):
-            if ('h1' in taggeds[key] or 'h2' in taggeds[key] or 'h3' in taggeds[key]) and ('b' in taggeds[key] or 'i' in taggeds[key] or 'u' in taggeds[key]):
-                weight = 10
-            elif ('h1' in taggeds[key] or 'h2' in taggeds[key] or 'h3' in taggeds[key]):
-                weight = 9
-            elif ('b' in taggeds[key] and 'i' in taggeds[key]) or ('b' in taggeds[key] and 'u' in taggeds[key]) or ('i' in taggeds[key] and 'u' in taggeds[key]):
-                weight = 8
-            elif ('b' in taggeds[key] or 'i' in taggeds[key] or 'u' in taggeds[key]):
-                weight = 7
+            if key in taggeds:
+                if ('h1' in taggeds[key] or 'h2' in taggeds[key] or 'h3' in taggeds[key]) and ('b' in taggeds[key] or 'i' in taggeds[key] or 'u' in taggeds[key]):
+                    weight = 10
+                elif ('h1' in taggeds[key] or 'h2' in taggeds[key] or 'h3' in taggeds[key]):
+                    weight = 9
+                elif ('b' in taggeds[key] and 'i' in taggeds[key]) or ('b' in taggeds[key] and 'u' in taggeds[key]) or ('i' in taggeds[key] and 'u' in taggeds[key]):
+                    weight = 8
+                elif ('b' in taggeds[key] or 'i' in taggeds[key] or 'u' in taggeds[key]):
+                    weight = 7
 
             conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
                 VALUES (?, ?, ?, ?)", (key, filePath, i, URL, weight))
