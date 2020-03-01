@@ -51,9 +51,9 @@ def show_results(the_entry, the_root):
     offset = 4
     list_of_results = []
     sortedDesc = sorted(list_of_URLs.items(), key=operator.itemgetter(1), reverse=True)[:10]
-    for url in sortedDesc.keys():
+    for url in sortedDesc:
         label = Label(the_root)
-        label["text"] = url 
+        label["text"] = url[0]
         list_of_results.append(label)
         label.grid(row=offset, column=0)
         offset += 1

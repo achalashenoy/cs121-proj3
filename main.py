@@ -37,29 +37,37 @@ with open("C:\WEBPAGES\\bookkeeping.json") as f:
 
 
 # tokenize from project 1
+'''This returns a list where the first element is the list of all tokens and the second element is the dictionary of all tagged tokens.'''
 def tokenize(fileName):
     file_text = open(fileName, encoding='utf8')
     
-    List = []
+    list_of_tokens = []
+    list_of_taggeds = []
+    list_of_tokens_and_taggeds = []
+    dict_of_taggeds = {}
     
     for line in file_text:
         textD = line.encode('ascii', errors='ignore').decode()
         prevChar = ""
         word = ""
+        list_of_taggeds.extend(returnlistOfAllTaggedTokens(textD))
         for i in textD:
             if(i.isalnum() == True):
                 word += i
             else:   
                 if (prevChar.isalnum() != True):
                     continue
-                List.append(word.lower())
+                list_of_tokens.append(word.lower())
                 word = ""
             prevChar = i
  
         if(len(word) != 0):
-            List.append(word.lower())
-            
-    return List
+            list_of_tokens.append(word.lower())
+    convertfromtuptodict(list_of_taggeds, dict_of_taggeds)
+    list_of_tokens_and_taggeds.append(list_of_tokens)
+    list_of_tokens_and_taggeds.append(dict_of_taggeds)
+
+    return list_of_tokens_and_taggeds
 
 # This will return list of tokens inside HTML tags, in the form of (token, type_of_tag).
 # For example, if the text is "<i>apple</i>", the list returned will be [("apple", "i")].
@@ -95,6 +103,12 @@ def returnlistOfAllTaggedTokens(the_string):
             list_of_tokens.extend([(token, "h3") for token in content.split()])        
     return list_of_tokens
 
+'''This turns a list of tuples into a dictionary of key-value pairs.'''
+def convertfromtuptodict(the_tuple, the_dict): 
+    for k, v in the_tuple: 
+        the_dict.setdefault(k, []).append(v) 
+    return the_dict 
+
 # compute frequencies from project 1
 def computeWordFrequencies(the_list):
     frequency = {}        
@@ -125,7 +139,9 @@ conn.execute('''CREATE TABLE UCIIndex
          Frequency       INT     NOT NULL,
          IDF             REAL   NULL,
          TF_IDF          REAL   NULL,
-         URL             TEXT)''')
+         URL             TEXT,
+         HTML_weight     INT    NULL''')
+
 cursor = conn.cursor()     
 
 # Clear the UCIIndex table that had data from the previous run
@@ -141,7 +157,9 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_RAW"):
     for f in files:
         documents_num += 1
         filePath = os.path.join(subdir, f)
-        tokens = tokenize(filePath)
+        values = tokenize(filePath)
+        tokens = values[0]
+        taggeds = values[1]
         filePath = subdir[16:] + "/" + f
 
         # remove stop words
@@ -168,10 +186,19 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_RAW"):
         doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
         # if you want to see the URL
         print(filePath)
-
+        weight = 1
         for key, i in sorted(the_dict.items()):
+            if ('h1' in taggeds[key] or 'h2' in taggeds[key] or 'h3' in taggeds[key]) and ('b' in taggeds[key] or 'i' in taggeds[key] or 'u' in taggeds[key]):
+                weight = 10
+            elif ('h1' in taggeds[key] or 'h2' in taggeds[key] or 'h3' in taggeds[key]):
+                weight = 9
+            elif ('b' in taggeds[key] and 'i' in taggeds[key]) or ('b' in taggeds[key] and 'u' in taggeds[key]) or ('i' in taggeds[key] and 'u' in taggeds[key]):
+                weight = 8
+            elif ('b' in taggeds[key] or 'i' in taggeds[key] or 'u' in taggeds[key]):
+                weight = 7
+
             conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
-                VALUES (?, ?, ?, ?)", (key, filePath, i, URL))
+                VALUES (?, ?, ?, ?)", (key, filePath, i, URL, weight))
     
         # commit the data
         conn.commit()
@@ -201,7 +228,8 @@ conn.execute('''CREATE TABLE UCIIndexWithIDF
          Frequency       INT     NOT NULL,
          IDF             REAL   NULL,
          TF_IDF          REAL   NULL,
-         URL             TEXT)''')
+         URL             TEXT,
+         HTML_weight    INT     NULL)''')
             
 Query = "SELECT u.Token, u.File, u.Frequency, i.IDF, TF_IDF, URL FROM UCIIndex u, IDF i WHERE u.Token = i.Token"
 cursor = conn.execute(Query)
@@ -218,7 +246,8 @@ conn.execute('''CREATE TABLE UCIIndexFinal
          Frequency       INT     NOT NULL,
          IDF             REAL   NULL,
          TF_IDF          REAL   NULL,
-         URL             TEXT)''')
+         URL             TEXT,
+         HTML_weight    INT     NULL)''')
 
 Query = "SELECT * from UCIIndexWithIDF"
 cursor = conn.execute(Query)
