@@ -1,35 +1,40 @@
 import os 
+import numpy
 import re
 # run only one time to download wordnet and stopwords
-'''import nltk
+import nltk
 nltk.download('wordnet')
-nltk.download('stopwords')'''
+nltk.download('stopwords')
+nltk.download('words')
 from nltk.stem import WordNetLemmatizer 
 from nltk.corpus import stopwords
 
-""" to obtain urls from bookkeeping.json"""
+words = set(nltk.corpus.words.words())
+words.add("mondego")
+
+# to obtain urls from bookkeeping.json
 import json
 
-""" sqlite3 """
+# sqlite3 
 import sqlite3
 
-'''defaultdict for dictionary of lists containing the docs for each token'''
+#'''defaultdict for dictionary of lists containing the docs for each token'''
 from collections import defaultdict
 
-""" maybe beautiful soup is needed later """
+#""" maybe beautiful soup is needed later """
 from bs4 import BeautifulSoup
 
 from string import punctuation
 
-""" change the path as needed, to load URLs from bookkeeping.json """
-with open("C:\WEBPAGES_CLEAN\\bookkeeping.json") as f:
+#""" change the path as needed, to load URLs from bookkeeping.json """
+with open("C:\WEBPAGES\\bookkeeping.json") as f:
   data = json.load(f)
   
-""" if you want to see the data in bookkeeping.json"""
+#""" if you want to see the data in bookkeeping.json"""
 #print(data)
 
 
-""" tokenize from project 1 """
+#""" tokenize from project 1 """
 def tokenize(fileName):
     file_text = open(fileName, encoding='utf8')
     
@@ -54,23 +59,23 @@ def tokenize(fileName):
             
     return List
 
-'''Not sure if this will be a better tokenizer. I tested it out and it LOOKS fine, but you will have to test it more.'''
-def NewTokenize(fileName):
-    file_text = open(fileName, encoding='utf8')
-    list_of_tokens = []
-    final_list = []
-    textD = file_text.encode('ascii', errors='ignore').decode()
-    for line in textD:        
-        soup = BeautifulSoup(line, "html.parser")
-        str_in_tags = [s for s in soup.strings]
-        for s in str_in_tags:
-            list_of_tokens.extend(s.split())
-    for s in list_of_tokens:
-        final_list.append(s.lower().strip(punctuation))
-    return final_list
+#'''Not sure if this will be a better tokenizer. I tested it out and it LOOKS fine, but you will have to test it more.'''
+# def NewTokenize(fileName):
+#     file_text = open(fileName, encoding='utf8')
+#     list_of_tokens = []
+#     final_list = []
+#     textD = file_text.encode('ascii', errors='ignore').decode()
+#     for line in textD:        
+#         soup = BeautifulSoup(line, "html.parser")
+#         str_in_tags = [s for s in soup.strings]
+#         for s in str_in_tags:
+#             list_of_tokens.extend(s.split())
+#     for s in list_of_tokens:
+#         final_list.append(s.lower().strip(punctuation))
+#     return final_list
 
-'''This will return list of tokens inside HTML tags, in the form of (token, type_of_tag).
-For example, if the text is "<i>apple</i>", the list returned will be [("apple", "i")].''' 
+#'''This will return list of tokens inside HTML tags, in the form of (token, type_of_tag).
+#For example, if the text is "<i>apple</i>", the list returned will be [("apple", "i")].''' 
 def returnlistOfAllTaggedTokens(the_string):
     list_of_tokens = []
     soup = BeautifulSoup(the_string, "html.parser")
@@ -103,7 +108,7 @@ def returnlistOfAllTaggedTokens(the_string):
             list_of_tokens.extend([(token, "h3") for token in content.split()])        
     return list_of_tokens
 
-""" compute frequencies from project 1 """
+#""" compute frequencies from project 1 """
 def computeWordFrequencies(the_list):
     frequency = {}        
     for token in the_list:
@@ -111,27 +116,25 @@ def computeWordFrequencies(the_list):
         frequency[token] = count + 1
     return frequency
 
-'''def newComputeWordFrequencies(a_dict, the_list):
-    for token in the_list:
-        count = a_dict.get(token, 0)
-        a_dict[token] = count + 1
-    return a_dict'''
-
 def computeDocsWithWords(a_dict, the_list, docNum):
     for token in the_list:
         a_dict[token].append(docNum)
     return a_dict
 
-""" if you want to test for two files """
+#""" if you want to test for two files """
 #file = "0\\198"
 #fileName = "C:\WEBPAGES_CLEAN\\" + file
 #tokens = tokenize(fileName)
 
-""" if the database doesn't exist, it will be created """
+#""" if the database doesn't exist, it will be created """
 conn = sqlite3.connect('Inverted.db')
 print ("Opened database successfully")
 
-""" IMPORTANT - execute this code one time to create the table, then comment it out """
+conn.execute('pragma journal_mode=OFF')
+conn.execute('pragma synchronous=OFF')
+
+
+#""" IMPORTANT - execute this code one time to create the table, then comment it out """
 """conn.execute('''CREATE TABLE UCIIndex
          (Token           TEXT    NOT NULL,
          File            INT     NOT NULL,
@@ -139,7 +142,8 @@ print ("Opened database successfully")
          URL             TEXT)''');
 """
 
-"""execute this code one time to create the 2-gram table, then comment it out """
+# execute this code one time to create the 2-gram table, then comment it out 
+conn.execute("DROP TABLE uciNGramIndex")
 conn.execute('''CREATE TABLE uciNGramIndex
          (first_half           TEXT    NOT NULL,
          second_half           TEXT     NOT NULL,
@@ -148,35 +152,38 @@ conn.execute('''CREATE TABLE uciNGramIndex
 
 cursor = conn.cursor()     
 
-"""Clear the UCIIndex table that had data from the previous run""" 
+# Clear the UCIIndex table that had data from the previous run
 cursor = conn.execute("DELETE FROM UCIIndex")
 
 #file = "0/199
 documents_num = 0
 
-'''the_dict is a dictionary where the keys are tokens and the values are frequencies'''
+# the_dict is a dictionary where the keys are tokens and the values are frequencies
 #the_dict = {}
 token_doc_url_file_tuple_list = []
 doc_dict = defaultdict(list)
-for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
+for subdir, dirs, files in os.walk("C:\WEBPAGES_RAW"):
     for f in files:
         documents_num += 1
         filePath = os.path.join(subdir, f)
-        tokens = NewTokenize(filePath)
-        filePath = subdir[18:] + "/" + f
+        tokens = tokenize(filePath)
+        filePath = subdir[16:] + "/" + f
 
-        """ remove stop words """
+        #""" remove stop words """
         stopWords = set(stopwords.words('english')) 
         filteredTokens = [w for w in tokens if len(w) > 1 if not w in stopWords]
     
         lemmatizer = WordNetLemmatizer() 
 
-        """lemmatize the date """
+        #"""lemmatize the date """
         lemmatized = []
 
         for k in filteredTokens:
         #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
             lemmatized.append(lemmatizer.lemmatize(k))
+        # remove non English like zz
+        #lemmatized_Engish = " ".join(w for w in lemmatized if w.lower() in words or not w.isalpha())
+        lemmatized_Engish = [w for w in lemmatized if w in words ]
         URL = data.get(filePath)
         for l in lemmatized:
             token_doc_url_file_tuple_list.append((l, filePath, documents_num, URL))
@@ -197,30 +204,82 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_CLEAN"):
         the_dict = computeWordFrequencies(lemmatized)
         #the_dict = newComputeWordFrequencies(the_dict, lemmatized)
         doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
-        """if you want to see the URL """
+        #"""if you want to see the URL """
         print(filePath)
-        print(URL)
-        """ populate the inverted index """
+        #print(URL)
+        #""" populate the inverted index """
 
         for key, i in sorted(the_dict.items()):
         #print(key, "\t", file, i, URL)
             conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
                 VALUES (?, ?, ?, ?)", (key, filePath, i, URL))
     
-        """ commit the data """
+        #""" commit the data """
         conn.commit()
 
-""" If you want to see all the data """
+# Unfortunately updates in any database are very slow and this index has 6 million rows. 
+# The work around is to use 3 temp tables as below. All the tables except UCIIndexFinal can be dropped at the end.
+# Create table to calculate IDF
+print("Creating IDF table")
+#conn.execute("DROP TABLE IDF");
+conn.execute('''CREATE TABLE IDF
+         (Token           TEXT    NOT NULL,
+         IDF             REAL   NULL)''')
+             
+Query = "SELECT Token, COUNT(File) AS IDF FROM UCIIndex GROUP BY Token"
+cursor = conn.execute(Query)
+for row in cursor:
+    conn.execute("INSERT INTO IDF (Token, IDF) \
+                VALUES (?, ?)", (row[0], row[1]))
+    conn.commit()
+
+# Create table UCIIndexWIthIDF to update with IDF
+print("Creating UCIIndexWithIDF because update super slow")
+#conn.execute("DROP TABLE UCIIndexWithIDF");
+conn.execute('''CREATE TABLE UCIIndexWithIDF
+         (Token           TEXT    NOT NULL,
+         File            INT     NOT NULL,
+         Frequency       INT     NOT NULL,
+         IDF             REAL   NULL,
+         TF_IDF          REAL   NULL,
+         URL             TEXT)''')
+            
+Query = "SELECT u.Token, u.File, u.Frequency, i.IDF, TF_IDF, URL FROM UCIIndex u, IDF i WHERE u.Token = i.Token"
+cursor = conn.execute(Query)
+for row in cursor:
+    conn.execute("INSERT INTO UCIIndexWithIDF (Token, File, Frequency, IDF, TF_IDF, URL) \
+                VALUES (?, ?, ?, ?, ?, ?)", (row[0], row[1], row[2], row[3], row[4], row[5]))
+    conn.commit()
+
+print("Creating UCIIndexFinal to update with TF_IDF") 
+#conn.execute("DROP TABLE UCIIndexFinal"); 
+conn.execute('''CREATE TABLE UCIIndexFinal
+         (Token           TEXT    NOT NULL,
+         File            INT     NOT NULL,
+         Frequency       INT     NOT NULL,
+         IDF             REAL   NULL,
+         TF_IDF          REAL   NULL,
+         URL             TEXT)''')
+
+Query = "SELECT * from UCIIndexWithIDF"
+cursor = conn.execute(Query)
+for row in cursor:
+    logg = str((1 + numpy.log(row[2])) * numpy.log(37497/row[3]))
+    conn.execute("INSERT INTO UCIIndexFinal (Token, File, Frequency, IDF, TF_IDF, URL) \
+                VALUES (?, ?, ?, ?, ?, ?)", (row[0], row[1], row[2], row[3], logg, row[5]))
+    cursor = conn.execute(Query)
+
+    conn.commit()     
+
+# All the temp tables can be dropped at the end
+#conn.execute("DROP TABLE UCIIndex");
+#conn.execute("DROP TABLE IDF");
+#conn.execute("DROP TABLE UCIIndexWithIDF");
+
+#""" If you want to see all the data """
 print(the_dict)
 print(len(the_dict))
 
-""" to test """
-#print(dict.get('mapping'))
-'''for item in sorted(token_doc_url_file_tuple_list):
-    conn.execute("INSERT INTO UCIIndex (Token, File, Frequency, URL) \
-        VALUES (?, ?, ?, ?)", (item[0], item[1], the_dict[item[0]], item[3])); 
-    """ """commit the data""" """
-    conn.commit()'''
 
 """ The query needs to be inputted by the user from the command line""" 
 #searchWord = 'mondego'
@@ -246,10 +305,10 @@ for term in terms:
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex"
 
-""" Execute the query """
+#""" Execute the query """
 #cursor = conn.execute(Query)
 
-""" Display the URLs that have the search word """
+#""" Display the URLs that have the search word """
 #print("\nBelow are results of the query: ")
 #list_of_URLs = []
 #for row in cursor:
@@ -258,10 +317,10 @@ for term in terms:
 #   print ("URL = ", row[3], "\n")
 #   list_of_URLs.append(row[3])
 
-""" make sure the program has completed """
+#""" make sure the program has completed """
 print("URLs have been retrieved from the inverted index.")
 
-""" close the database """
+#""" close the database """
 conn.close()
 
 def NumOfUniques(a_dict):
