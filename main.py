@@ -50,8 +50,8 @@ def tokenize(fileName):
         textD = line.encode('ascii', errors='ignore').decode()
         prevChar = ""
         word = ""
+        list_of_taggeds.extend(returnlistOfAllTaggedTokens(textD))
         for i in textD:
-            list_of_taggeds.extend(returnlistOfAllTaggedTokens(textD))
             if(i.isalnum() == True):
                 word += i
             else:   
