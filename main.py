@@ -144,7 +144,7 @@ conn.execute('pragma synchronous=OFF')
 
 # execute this code one time to create the 2-gram table, then comment it out 
 # uncomment the drop table as needed
-#conn.execute("DROP TABLE uciNGramIndex")
+conn.execute("DROP TABLE uciNGramIndex")
 conn.execute('''CREATE TABLE uciNGramIndex
          (first_half           TEXT    NOT NULL,
          second_half           TEXT     NOT NULL,
@@ -191,17 +191,17 @@ for subdir, dirs, files in os.walk("C:\WEBPAGES_RAW"):
             #doc_dict[l].append(documents_num)
 
         # Below is me finding the 2-grams then adding the 2-grams to the 2-gram table -Jen
-        other_list = lemmatized
-        n_gram = []
-        for i in (range(len(other_list))):
-            if (len(other_list) <= 1):
-                break
-            n_gram.append(other_list[0])
-            n_gram.append(other_list[1])
-            other_list = other_list[1:]
-            conn.execute("INSERT INTO uciNGramIndex (first_half, second_half, URL, Document) \
-                VALUES (?, ?, ?, ?)", (n_gram[0], n_gram[1], URL, documents_num))
-            n_gram = []
+        # other_list = lemmatized
+        # n_gram = []
+        # for i in (range(len(other_list))):
+        #     if (len(other_list) <= 1):
+        #         break
+        #     n_gram.append(other_list[0])
+        #     n_gram.append(other_list[1])
+        #     other_list = other_list[1:]
+        #     conn.execute("INSERT INTO uciNGramIndex (first_half, second_half, URL, Document) \
+        #         VALUES (?, ?, ?, ?)", (n_gram[0], n_gram[1], URL, documents_num))
+        #     n_gram = []
         the_dict = computeWordFrequencies(lemmatized)
         #the_dict = newComputeWordFrequencies(the_dict, lemmatized)
         doc_dict = computeDocsWithWords(doc_dict, lemmatized, documents_num)
