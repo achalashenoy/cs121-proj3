@@ -5,9 +5,10 @@ from numpy import dot
 from numpy.linalg import norm
 import operator
 from tkinter import *
+import RetrieveURLs
 
 """ if the database doesn't exist, it will be created """
-conn = sqlite3.connect('Inverted.db')
+conn = sqlite3.connect('Inverted3.db')
 print ("Opened database successfully")
 
 cursor = conn.cursor()     
@@ -56,6 +57,21 @@ def show_results(the_entry, the_root):
         list_of_results.append(label)
         label.grid(row=offset, column=0)
         offset += 1
+
+root = Tk()
+root.title("Search Engine")
+root.geometry('700x600+100+100')
+
+title_label = Label(root, text="Enter query below")
+e = Entry(root)
+button = Button(root, text="Search", command = lambda: RetrieveURLs.show_results(e, root))
+
+title_label.grid(row=0, column=0)
+e.grid(row=1,column=0)
+button.grid(row=2, column=0)
+e.delete(0, END)
+
+root.mainloop()
 
 #sortedDesc = sorted(list_of_URLs.items(), key=operator.itemgetter(1), reverse=True)[:10]
 # Showing cosine similarity for testing, need to show only URLs line by line

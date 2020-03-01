@@ -123,8 +123,9 @@ conn.execute('''CREATE TABLE UCIIndex
          (Token           TEXT    NOT NULL,
          File            INT     NOT NULL,
          Frequency       INT     NOT NULL,
+         IDF             REAL   NULL,
+         TF_IDF          REAL   NULL,
          URL             TEXT)''')
-
 cursor = conn.cursor()     
 
 # Clear the UCIIndex table that had data from the previous run
