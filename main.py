@@ -372,8 +372,8 @@ def NumOfUniques(a_dict):
             uniques += 1
     return uniques
 
-stats = "# of Documents: " + str(documents_num) + "\n" 
-stats += "# of Unique Words: " + str(NumOfUniques(doc_dict)) + "\n"
-stats += "# of URLs for Query: " + str(len(list_of_URLs)) + "\n"
-stats += str(list_of_URLs[:24]) + "\n"
-print(stats)
+#stats = "# of Documents: " + str(documents_num) + "\n" 
+#stats += "# of Unique Words: " + str(NumOfUniques(doc_dict)) + "\n"
+#stats += "# of URLs for Query: " + str(len(list_of_URLs)) + "\n"
+#stats += str(list_of_URLs[:24]) + "\n"
+#print(stats)
