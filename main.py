@@ -235,7 +235,7 @@ Query = "SELECT u.Token, u.File, u.Frequency, i.IDF, TF_IDF, URL FROM UCIIndex u
 cursor = conn.execute(Query)
 for row in cursor:
     conn.execute("INSERT INTO UCIIndexWithIDF (Token, File, Frequency, IDF, TF_IDF, URL) \
-                VALUES (?, ?, ?, ?, ?, ?)", (row[0], row[1], row[2], row[3], row[4], row[5]))
+                VALUES (?, ?, ?, ?, ?, ?)", (row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
     conn.commit()
 
 print("Creating UCIIndexFinal to update with TF_IDF") 
@@ -254,7 +254,7 @@ cursor = conn.execute(Query)
 for row in cursor:
     logg = str((1 + numpy.log(row[2])) * numpy.log(37497/row[3]))
     conn.execute("INSERT INTO UCIIndexFinal (Token, File, Frequency, IDF, TF_IDF, URL) \
-                VALUES (?, ?, ?, ?, ?, ?)", (row[0], row[1], row[2], row[3], logg, row[5]))
+                VALUES (?, ?, ?, ?, ?, ?)", (row[0], row[1], row[2], row[3], logg, row[5], row[6]))
     cursor = conn.execute(Query)
 
     conn.commit()     
