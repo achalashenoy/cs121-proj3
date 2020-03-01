@@ -140,9 +140,9 @@ conn.execute('''CREATE TABLE UCIIndex
          IDF             REAL   NULL,
          TF_IDF          REAL   NULL,
          URL             TEXT,
-         HTML_weight     INT    NULL''')
+         HTML_weight     INT    NULL)''')
 
-cursor = conn.cursor()     
+cursor = conn.cursor() 
 
 # Clear the UCIIndex table that had data from the previous run
 cursor = conn.execute("DELETE FROM UCIIndex")
