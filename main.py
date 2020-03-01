@@ -1,4 +1,5 @@
-import os 
+import os
+import tkinter
 import numpy
 import re
 # run only one time to download wordnet and stopwords
@@ -278,18 +279,58 @@ for row in cursor:
 #conn.execute("DROP TABLE UCIIndexWithIDF");
 
 #""" If you want to see all the data """
-print(the_dict)
-print(len(the_dict))
+#print(the_dict)
+#print(len(the_dict))
 
 
 """ The query needs to be inputted by the user from the command line""" 
 #searchWord = 'mondego'
-searchWord = input("Enter your search terms: ")
-terms = searchWord.split(" ")
+#searchWord = input("Enter your search terms: ")
+def show_results():
+    search_query = e.get()
+    terms = search_query.split(" ")
+    list_of_URLs = []
+    for term in terms:
+        Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + term + "'"
+        """ Execute the query """
+        cursor = conn.execute(Query)
+        """ Display the URLs that have the search word """
+        for row in cursor:
+        """ print for testing, then comment out """
+            if row[3] not in list_of_URLs:
+                print (row[0], " - ", row[1], "," , row[2])
+                print ("URL = ", row[3], "\n")
+                list_of_URLs.append(row[3])
+    offset = 4
+    list_of_results = []
+    for url in list_of_URLs:
+        label = Label(root)
+        label["text"] = url 
+        list_of_results.append(label)
+        label.grid(row=offset, column=0)
+        offset += 1
+
+root = Tk()
+root.title("Search Engine")
+root.geometry('700x600+100+100')
+
+title_label = Label(root, text="Enter query below")
+button = Button(root, text="Search", command = show_results)
+
+e = Entry(root)
+#title_label.pack()
+#e.pack()
+
+title_label.grid(row=0, column=0)
+e.grid(row=1,column=0)
+button.grid(row=2, column=0)
+e.delete(0, END)
+
+root.mainloop()
 
 
 #Will test this when I get home, probably works but there may be a faster way than executing multiple queries
-list_of_URLs = []
+'''list_of_URLs = []
 for term in terms:
     Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + term + "'"
     """ Execute the query """
@@ -302,7 +343,7 @@ for term in terms:
             print (row[0], " - ", row[1], "," , row[2])
             print ("URL = ", row[3], "\n")
             list_of_URLs.append(row[3])
-
+'''
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex WHERE Token = '" + searchWord + "'"
 #Query = "SELECT Token, File, Frequency, URL from UCIIndex"
 
