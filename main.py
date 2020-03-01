@@ -1,5 +1,5 @@
 import os
-import tkinter
+from tkinter import *
 import numpy
 import re
 # run only one time to download wordnet and stopwords
@@ -9,6 +9,7 @@ nltk.download('stopwords')
 nltk.download('words')
 from nltk.stem import WordNetLemmatizer 
 from nltk.corpus import stopwords
+import RetrieveURLs
 
 words = set(nltk.corpus.words.words())
 words.add("mondego")
@@ -282,11 +283,10 @@ for row in cursor:
 #print(the_dict)
 #print(len(the_dict))
 
-
-""" The query needs to be inputted by the user from the command line""" 
+ 
 #searchWord = 'mondego'
 #searchWord = input("Enter your search terms: ")
-def show_results():
+'''def show_results():
     search_query = e.get()
     terms = search_query.split(" ")
     list_of_URLs = []
@@ -309,17 +309,14 @@ def show_results():
         list_of_results.append(label)
         label.grid(row=offset, column=0)
         offset += 1
-
+'''
 root = Tk()
 root.title("Search Engine")
 root.geometry('700x600+100+100')
 
 title_label = Label(root, text="Enter query below")
-button = Button(root, text="Search", command = show_results)
-
 e = Entry(root)
-#title_label.pack()
-#e.pack()
+button = Button(root, text="Search", command = lambda: RetrieveURLs.show_results(e, root))
 
 title_label.grid(row=0, column=0)
 e.grid(row=1,column=0)
