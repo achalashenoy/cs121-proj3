@@ -7,11 +7,41 @@ import operator
 from tkinter import *
 import RetrieveURLs
 
+import nltk
+nltk.download('wordnet')
+nltk.download('stopwords')
+nltk.download('words')
+from nltk.stem import WordNetLemmatizer 
+from nltk.corpus import stopwords
+
+def tokenize(query):
+    
+    List = []
+    textD = query.encode('ascii', errors='ignore').decode()   
+    
+    prevChar = ""
+    word = ""
+    for i in textD:
+        
+        if(i.isalnum() == True):
+            word += i
+        else:   
+            if (prevChar.isalnum() != True):
+                continue
+            List.append(word.lower())
+            word = ""
+        prevChar = i
+ 
+    if(len(word) != 0):
+        List.append(word.lower())
+            
+    return List
+
 """ if the database doesn't exist, it will be created """
 conn = sqlite3.connect('Inverted.db')
 print ("Opened database successfully")
 
-cursor = conn.cursor()     
+cursor = conn.cursor()    
 
 #searchWord = input("Enter your search terms: ")
 #terms = searchWord.split(" ")
@@ -19,7 +49,24 @@ cursor = conn.cursor()
 
 def show_results(the_entry, the_root): 
     search_query = the_entry.get()
-    terms = search_query.split(" ")
+    
+    tokens = tokenize(search_query)
+
+    # remove stop words
+    stopWords = set(stopwords.words('english')) 
+    filteredTokens = [w for w in tokens if len(w) > 2 if not w in stopWords]
+    
+    lemmatizer = WordNetLemmatizer() 
+
+    # lemmatize the date
+    lemmatized = []
+    
+    for k in filteredTokens:
+        #print(lemmatizer.lemmatize(i) + "\t\t\t" + file)
+        lemmatized.append(lemmatizer.lemmatize(k))
+        
+    terms = lemmatized 
+    
     list_of_URLs = {}
     #i = 0
     N = 37497
@@ -62,11 +109,11 @@ def show_results(the_entry, the_root):
         #break;
     offset = 4
     header = Label(the_root)
-    header["text"] = "Below are the results of the top 10 queries"
+    header["text"] = "Below are the results of the top 20 queries"
     header.grid(row=offset, column=0)
     offset += 1
     list_of_results = []
-    sortedDesc = sorted(list_of_URLs.items(), key=operator.itemgetter(1), reverse=True)[:10]
+    sortedDesc = sorted(list_of_URLs.items(), key=operator.itemgetter(1), reverse=True)[:20]
     for url in sortedDesc:
         label = Label(the_root, anchor = "w", width = 70)
         label["text"] = url[0]
