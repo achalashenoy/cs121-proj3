@@ -267,7 +267,7 @@ conn.execute("DROP TABLE UCIIndexWithIDF")
  
 root = Tk()
 root.title("Search Engine")
-root.geometry('700x600+100+100')
+root.geometry('800x800+100+100')
 
 title_label = Label(root, text="Enter query below")
 e = Entry(root)
