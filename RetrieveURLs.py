@@ -49,13 +49,17 @@ def show_results(the_entry, the_root):
             print(i)
         #break;
     offset = 4
+    header = Label(the_root)
+    header["text"] = "Below are the results of the top 10 queries"
+    header.grid(row=offset, column=0)
+    offset += 1
     list_of_results = []
     sortedDesc = sorted(list_of_URLs.items(), key=operator.itemgetter(1), reverse=True)[:10]
     for url in sortedDesc:
-        label = Label(the_root)
+        label = Label(the_root, anchor = "w", width = 70)
         label["text"] = url[0]
         list_of_results.append(label)
-        label.grid(row=offset, column=0)
+        label.grid(row=offset, column=0, padx = 50)
         offset += 1
 
 root = Tk()
